@@ -117,7 +117,11 @@ En la base de datos `demo` se comprobará que están instaladas las aplicaciones
 
 ![alt text](capturas/11-aplicaciones.png)
 
-### 6.2. Tipos de producto e impuestos
+### 6.2 Impuestos en nuestro país
+
+![alt text](capturas/01-correccion-localizacion.png)
+
+### 6.3. Tipos de producto e impuestos
 
 Se revisarán productos de demostración para identificar los tipos disponibles en Odoo 19:
 
@@ -164,19 +168,23 @@ Se crearán estos dos productos:
 | Hora de soporte | Servicio | 40 € | 21 % | Sí |
 | Libro técnico | Bienes | 25 € | 4 % | Sí |
 
-![alt text](capturas/19-hora-soporte.png)
-![alt text](capturas/20-libro-tecnico.png)
+![alt text](capturas/19-correcion-hora-soporte.png)
+![alt text](capturas/20-correcion-libro-tecnico.png)
 
 ### 7.4. Crear y confirmar el presupuesto
 
 Se creará un presupuesto para el cliente anterior, incluyendo los dos productos. Se enviará sin realizar un envío de correo real y se confirmará para convertirlo en pedido de venta.
 
-![alt text](capturas/21-presupuesto.png)
-![alt text](capturas/22-pedido-venta.png)
+![alt text](capturas/21-correcion-presupuesto.png)
+![alt text](capturas/21-correcion-facturacion-extra.png)
+
 
 ### 7.5. Crear, confirmar y pagar la factura
 
 Desde el pedido de venta se creará la factura. Se comprobará que cada línea tiene su impuesto correspondiente y que los importes son correctos. Después se confirmará la factura, se imprimirá en PDF y se registrará el pago.
+
+![alt text](capturas/23-pagar-factura.png)
+![alt text](capturas/24-pago-confirmado.png)
 
 ## 8. Vistas, búsquedas y filtros
 
@@ -208,6 +216,44 @@ Cuando esté activo, aparecerá el icono del escarabajo en la barra superior.
 ![alt text](capturas/32-modo-desarrollador-url.png)
 
 Con el modo desarrollador activado se identificarán dos campos técnicos del formulario de contacto y el modelo de una factura.
+
+#### Pruebas:
+
+![alt text](capturas/25-NIF-empresa.png)
+| Propiedad | Valor |
+| :--- | :--- |
+| **Etiqueta** | NIF |
+| **Campo** | `vat` |
+| **Modelo** | `res.partner` |
+| **Tipo** | `char` |
+| **Widget** | Texto (`field_partner_autocomplete`)|
+| **Contexto** | `{}` |
+
+![alt text](capturas/26-Sitio-web.png)
+| Propiedad | Valor |
+| :--- | :--- |
+| **Etiqueta** | Enlace del sitio web |
+| **Campo** | `website` |
+| **Modelo** | `res.partner` |
+| **Tipo** | `char` |
+| **Widget** | URL (`url`) |
+| **Contexto** | `{}` |
+
+![alt text](capturas/27-cliente-factura.png)
+| Propiedad | Valor |
+| :--- | :--- |
+| **Etiqueta** | Socio |
+| **Campo** | `partner_id` |
+| **Modelo** | `account.move` |
+| **Tipo** | `many2one` |
+| **Widget** | Many2one (`res_partner_many2one`) |
+| **Contexto** | `{'res_partner_search_mode': (context.get('default_move_type', 'entry') in ('out_invoice', 'out_refund', 'out_receipt') and 'customer') or (context.get('default_move_type', 'entry') in ('in_invoice', 'in_refund', 'in_receipt') and 'supplier') or False, 'show_address': 1, 'default_is_company': True, 'show_vat': True}` |
+| **Dominio** | `(company_id and ['\|', ('company_id', '=', False), ('company_id', 'parent_of', [company_id])] or ['\|', ('company_id', '=', False), ('company_id', 'parent_of', '')]) + ([])` |
+| **Invisible** | `move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')` |
+| **Sólo lectura** | `state != 'draft'` |
+| **Cambiar por defecto** | Sí |
+| **Relación** | `res.partner`|
+
 
 ## 10. Incidencias encontradas y soluciones
 
